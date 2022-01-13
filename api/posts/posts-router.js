@@ -71,7 +71,33 @@ router.delete('/:id', async (req, res) => {
 
 //PUT
 router.put('/:id', (req, res) => {
-    
+    const { title, contents } = req.body
+    if (!title || !contents) {
+        res.status(400).json({ message: "Please provide title and contents for the post" })
+    } else {
+        Post.findById(req.params.id)
+            .then(update => {
+                if (!update) {
+                    res.status(404).json({ message: "The post with the specified ID does not exist" })
+                } else {
+                    return Post.update(req.params.id, req.body)
+                }
+            })
+            .then(numberUpdated => {
+                if (numberUpdated) {
+                    return Post.findById(req.params.id)
+                }
+            })
+            .then(updatedPost => {
+                if (updatedPost) {
+                    res.json(updatedPost)
+                }
+            })
+            .catch(error => {
+                res.status(500).json({ message: "The post information could not be modified" })
+                console.log(error)
+            })
+    }
 })
 
 //GET
