@@ -100,9 +100,20 @@ router.put('/:id', (req, res) => {
     }
 })
 
-//GET
-router.get('/:id/messages', (req, res) => {
-    
+//GET messages
+router.get('/:id/comments', async (req, res) => {
+    try {
+        const onPost = await Post.findById(req.params.id)
+        if (!onPost) {
+            res.status(404).json({ message: "The post with the specified ID does not exist" })
+        } else {
+            const postComments = await Post.findPostComments(req.params.id)
+            res.json(postComments)
+        }
+    } catch(error) {
+        res.status(500).json({ message: "The comments information could not be retrieved" })
+        console.log(error)
+    }
 })
 
 module.exports = router
